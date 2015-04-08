@@ -23,7 +23,7 @@ import java.util.Random;
 
 import org.apache.tomcat.util.codec.binary.Base64;
 
-import com.xeci.pamm.Util.ENV;
+import com.xrci.pamm.Util.ENV;
 
 public class MakeDB 
 {

@@ -1,4 +1,4 @@
-package com.xeci.pamm.Util;
+package com.xrci.pamm.Util;
 
 public class ENV 
 {

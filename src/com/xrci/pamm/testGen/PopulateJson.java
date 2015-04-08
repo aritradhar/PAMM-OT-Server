@@ -26,7 +26,7 @@ import java.sql.SQLException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.xeci.pamm.Util.ENV;
+import com.xrci.pamm.Util.ENV;
 
 public class PopulateJson 
 {
