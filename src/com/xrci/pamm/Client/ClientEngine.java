@@ -70,7 +70,7 @@ public class ClientEngine
 	{
 		long start = System.currentTimeMillis();
 		
-		int choice = new Random().nextInt(200);
+		int choice = new Random().nextInt(100);
 		System.out.println("choice" + choice);
 		ClientEngine CE = new ClientEngine(choice);
 		BigInteger[] out = CE.sendHandShake();

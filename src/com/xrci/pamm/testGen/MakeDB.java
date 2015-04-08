@@ -14,6 +14,7 @@
 
 package com.xrci.pamm.testGen;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -39,20 +40,32 @@ public class MakeDB
 		PreparedStatement ps = conn.prepareStatement(sql);
 		ps.setString(1, str);
 
-
 		ps.execute();
 		ps.close();
 		conn.close();
 	}
 	
 	//test
-	public static void main(String[] args) throws InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException 
+	public static void main(String[] args) throws InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException, IOException 
 	{
+		Class.forName(ENV.driver).newInstance();
+		Connection conn = DriverManager.getConnection(ENV.url+ENV.dbName,ENV.userName,ENV.password);
+		
+		String sql = new String();
+
+		sql = "TRUNCATE TABLE adv";
+
+		PreparedStatement ps = conn.prepareStatement(sql);
+		ps.execute();
+		ps.close();
+		conn.close();
+		
+		
 		Random rand = new Random();
 		byte[] b = new byte[256];
 		String s = null;
 		
-		for(int i = 0; i < 200; i++)
+		for(int i = 0; i < 10000; i++)
 		{
 			rand.nextBytes(b);
 			s = Base64.encodeBase64URLSafeString(b);
@@ -60,5 +73,9 @@ public class MakeDB
 		}
 		
 		System.out.println("done...");
+		
+		PopulateJson.populate();
+		
+		System.out.println("Pupulate JSON done...");
 	}
 }

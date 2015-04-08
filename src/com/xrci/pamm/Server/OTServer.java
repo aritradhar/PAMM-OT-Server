@@ -212,7 +212,7 @@ public class OTServer extends HttpServlet
 			//for(int i = 0; i < base64Keys.length; i++)
 			//{
 			BigInteger V = query;
-			System.out.println("V " + V);
+			//System.out.println("V " + V);
 			UserList.putQuery(ip, port, query);
 			BigInteger[] X = UserList.getX(ip, port);
 
@@ -229,12 +229,16 @@ public class OTServer extends HttpServlet
 
 			JSONObject enc_Json = Utils.putInJSONEnc(enc);
 			
+			//logging
 			FileWriter wr = new FileWriter("C:\\logs\\" + Utils.makeAddress(ip, port) + "_log.txt", true);
 			wr.append(enc_Json.toString(2));
 			wr.close();
 			
 			//Utils.LZMA_ZIP("C:\\logs\\" + Utils.makeAddress(ip, port) + "_log.txt", "C:\\logs\\" + Utils.makeAddress(ip, port) + "_lzma.xz");
-
+			//enc_Json can be compressed
+			byte[] in = enc_Json.toString(2).getBytes();
+			
+			//res.getOutputStream().write(enc_Json.toString(2).getBytes());
 			res.getOutputStream().write(enc_Json.toString(2).getBytes());
 			res.getOutputStream().flush();
 			res.getOutputStream().close();

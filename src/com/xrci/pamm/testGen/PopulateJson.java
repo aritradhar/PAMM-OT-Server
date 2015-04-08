@@ -30,7 +30,7 @@ import com.xeci.pamm.Util.ENV;
 
 public class PopulateJson 
 {
-	public static void main(String[] args) throws InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException, IOException 
+	public static void populate() throws InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException, IOException 
 	{
 		Class.forName(ENV.driver).newInstance();
 		Connection conn = DriverManager.getConnection(ENV.url+ENV.dbName,ENV.userName,ENV.password);
