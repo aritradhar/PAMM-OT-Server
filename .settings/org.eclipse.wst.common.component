@@ -14,6 +14,12 @@
         <dependent-module archiveName="LZMA.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/LZMA/LZMA">
             <dependency-type>uses</dependency-type>
         </dependent-module>
+        <dependent-module archiveName="mysql-connector-java-5.1.25.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/C:/lib/mysql-connector-java-5.1.25.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="commons-codec-1.10.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/C:/lib/Apache Commons/commons-codec-1.10.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
         <property name="context-root" value="PAMM_OT_Server"/>
         <property name="java-output-path" value="/PAMM OT Server/build/classes"/>
     </wb-module>

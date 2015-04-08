@@ -17,6 +17,7 @@ import org.json.JSONObject;
 
 import com.crypto.EvenGoldreichLempel;
 import com.util.Utils;
+import com.xeci.pamm.Util.ENV;
 
 
 /**
@@ -102,12 +103,12 @@ public class MainServlet extends HttpServlet
 
 			if(!loaded)
 			{
-				BufferedReader brN = new BufferedReader(new FileReader("C:\\KeyBase\\N.key"));
-				BufferedReader brD = new BufferedReader(new FileReader("C:\\KeyBase\\D.key"));
-				BufferedReader brE = new BufferedReader(new FileReader("C:\\KeyBase\\E.key"));
+				BufferedReader brN = new BufferedReader(new FileReader(ENV.KEYBASE_N));
+				BufferedReader brD = new BufferedReader(new FileReader(ENV.KEYBASE_D));
+				BufferedReader brE = new BufferedReader(new FileReader(ENV.KEYBASE_E));
 
-				BufferedReader brSignKey = new BufferedReader(new FileReader("C:\\KeyBase\\EC_SK.key"));
-				BufferedReader brVerifyKey = new BufferedReader(new FileReader("C:\\KeyBase\\EC_PK.key"));
+				BufferedReader brSignKey = new BufferedReader(new FileReader(ENV.KEYBASE_EC_SK));
+				BufferedReader brVerifyKey = new BufferedReader(new FileReader(ENV.KEYBASE_EC_PK));
 				
 				N = new BigInteger(brN.readLine());
 				D = new BigInteger(brD.readLine());
