@@ -236,14 +236,23 @@ public class OTServer extends HttpServlet
 			
 			//Utils.LZMA_ZIP("C:\\logs\\" + Utils.makeAddress(ip, port) + "_log.txt", "C:\\logs\\" + Utils.makeAddress(ip, port) + "_lzma.xz");
 			//enc_Json can be compressed
-			byte[] in = enc_Json.toString(2).getBytes();
 			
 			//res.getOutputStream().write(enc_Json.toString(2).getBytes());
-			res.getOutputStream().write(enc_Json.toString(2).getBytes());
+			//long st = System.currentTimeMillis();
+			
+			if(!ENV.TRAFFIC_COMPRESSION)
+				res.getOutputStream().write(enc_Json.toString(2).getBytes());
+			
+			else
+				res.getOutputStream().write(Utils.LZMA_ZIP(enc_Json.toString(2).getBytes()));
+			
+			//long en = System.currentTimeMillis();
+			//System.out.println("Encode time : " + (en - st));
+			
 			res.getOutputStream().flush();
 			res.getOutputStream().close();
 			
-			System.out.println("here");
+			//System.out.println("here");
 			//}
 
 		}

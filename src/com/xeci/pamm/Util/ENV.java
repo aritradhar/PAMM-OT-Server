@@ -16,4 +16,6 @@ public class ENV
 	public static final String KEYBASE_EC_SK = "C:\\KeyBase\\EC_SK.key";
 	
 	public static final String STRING_DB = "C:\\String\\String.json";
+	
+	public static final boolean TRAFFIC_COMPRESSION = false;
 }

@@ -20,6 +20,9 @@
         <dependent-module archiveName="commons-codec-1.10.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/C:/lib/Apache Commons/commons-codec-1.10.jar">
             <dependency-type>uses</dependency-type>
         </dependent-module>
+        <dependent-module archiveName="commons-io-2.4.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/C:/lib/commons-io-2.4/commons-io-2.4.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
         <property name="context-root" value="PAMM_OT_Server"/>
         <property name="java-output-path" value="/PAMM OT Server/build/classes"/>
     </wb-module>

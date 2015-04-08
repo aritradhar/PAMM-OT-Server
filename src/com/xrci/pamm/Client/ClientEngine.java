@@ -15,33 +15,30 @@
 
 package com.xrci.pamm.Client;
 
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.DataOutputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.file.Files;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PublicKey;
-import java.security.Signature;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Random;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.broadcast.BroadCaster;
 import com.crypto.EvenGoldreichLempel;
 import com.util.Utils;
+import com.xeci.pamm.Util.ENV;
 
 public class ClientEngine 
 {
@@ -92,7 +89,7 @@ public class ClientEngine
 		//System.out.println("V " + CE.V);
 
 		CE.Enc = CE.sendOTQuery();
-		System.out.println("Here");
+		//System.out.println("Here");
 		CE.Decrypt();
 		System.out.println(Utils.bigIntegerToString(CE.Dec));
 		
@@ -221,8 +218,23 @@ public class ClientEngine
 		System.out.println("Post parameters : " + urlParameters);
 		System.out.println("Response Code : " + responseCode);
 
-		BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-
+		BufferedReader in = null; 
+		//BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+		
+		//long st = System.currentTimeMillis();
+		
+		if(!ENV.TRAFFIC_COMPRESSION)
+		in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+		
+		else
+		{
+			byte[] data = Utils.LZMA_UNZIP( IOUtils.toByteArray(con.getInputStream()));
+			in = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(data)));
+		}
+		
+		//long en = System.currentTimeMillis();
+		//System.out.println("Decode time : " + (en - st));
+		
 		String inputLine;
 		StringBuffer inputJSON = new StringBuffer("");
 
@@ -272,7 +284,6 @@ public class ClientEngine
 		wr.writeBytes(urlParameters);
 		wr.flush();
 		wr.close();
-
 
 		int responseCode = con.getResponseCode();
 		
