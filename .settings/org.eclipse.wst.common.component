@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
+    <wb-module deploy-name="PAMM OT Server">
+        <wb-resource deploy-path="/" source-path="/WebContent" tag="defaultRootSource"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
+        <dependent-module archiveName="Crypt.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/Crypt/Crypt">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="Curve-25519.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/Curve-25519/Curve-25519">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="JSON-java.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/JSON-java/JSON-java">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="LZMA.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/LZMA/LZMA">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <property name="context-root" value="PAMM_OT_Server"/>
+        <property name="java-output-path" value="/PAMM OT Server/build/classes"/>
+    </wb-module>
+</project-modules>
