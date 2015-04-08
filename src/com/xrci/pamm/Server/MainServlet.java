@@ -1,4 +1,4 @@
-package com.Server;
+package com.xrci.pamm.Server;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
