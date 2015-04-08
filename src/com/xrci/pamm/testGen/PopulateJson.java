@@ -68,5 +68,7 @@ public class PopulateJson
 		
 		ps.close();
 		conn.close();
+		
+		System.out.println("done..");
 	}
 }

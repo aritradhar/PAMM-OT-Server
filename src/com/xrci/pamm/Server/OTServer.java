@@ -29,9 +29,11 @@ public class OTServer extends HttpServlet
 	private static final long serialVersionUID = 1L;
 
 	public static BigInteger N,D,E;	
-	int n_msg = 200;
+	int n_msg;
 	public static String keyJson;
+	//string received
 	public static String[] base64Keys;
+	//strings converted to biginteger number
 	public static BigInteger[] bigIntegerKeys;
 	public static String signKey, verifyKey;
 
@@ -41,7 +43,7 @@ public class OTServer extends HttpServlet
 	{
 		super();
 
-		BufferedReader br = new BufferedReader(new FileReader("C:\\KeyBase\\Key.json"));
+		BufferedReader br = new BufferedReader(new FileReader(ENV.STRING_DB));
 		String s = "";
 		StringBuffer sb = new StringBuffer("");
 
@@ -56,7 +58,7 @@ public class OTServer extends HttpServlet
 		// parse json from the key file
 
 		JSONObject jObject = new JSONObject(keyJson);
-		JSONArray jArray = jObject.getJSONArray("ImageBase64KeyMap");
+		JSONArray jArray = jObject.getJSONArray("StringDB");
 		base64Keys = new String[jArray.length()];
 		bigIntegerKeys = new BigInteger[jArray.length()];
 
@@ -67,7 +69,7 @@ public class OTServer extends HttpServlet
 			JSONObject ob = (JSONObject) jArray.get(i);
 			//System.out.println(ob.get("imgFile").toString());
 
-			base64Keys[i] = (String) ob.get("key");
+			base64Keys[i] = (String) ob.get("string");
 			bigIntegerKeys[i] = Utils.stringToBigInteger(base64Keys[i]);
 
 		}
@@ -164,7 +166,7 @@ public class OTServer extends HttpServlet
 
 		//handshake -> state 1
 		//send RSA n and e and Elliptic curve public key for signature
-		if(flag.equalsIgnoreCase("handshake"))
+		else if(flag.equalsIgnoreCase("handshake"))
 		{
 			if(UserList.getState(ip, port) > 0)
 			{
@@ -182,7 +184,8 @@ public class OTServer extends HttpServlet
 			res.getOutputStream().close();
 		}
 
-		if(flag.equalsIgnoreCase("otKeys"))
+		
+		else if(flag.equalsIgnoreCase("otKeys"))
 		{
 			BigInteger[] X =  EvenGoldreichLempel.generateRandomMsg(n_msg, 4);
 			boolean status = UserList.putX(ip, port, X);
@@ -202,14 +205,14 @@ public class OTServer extends HttpServlet
 			res.getOutputStream().close();
 		}
 
-		if(flag.equalsIgnoreCase("otQuery"))
+		else if(flag.equalsIgnoreCase("otQuery"))
 		{
 			BigInteger query = new BigInteger(request.getParameter("query"));
 
 			//for(int i = 0; i < base64Keys.length; i++)
 			//{
 			BigInteger V = query;
-			//System.out.println("V " + V);
+			System.out.println("V " + V);
 			UserList.putQuery(ip, port, query);
 			BigInteger[] X = UserList.getX(ip, port);
 
@@ -235,11 +238,13 @@ public class OTServer extends HttpServlet
 			res.getOutputStream().write(enc_Json.toString(2).getBytes());
 			res.getOutputStream().flush();
 			res.getOutputStream().close();
+			
+			System.out.println("here");
 			//}
 
 		}
 
-		if(flag.equalsIgnoreCase("getkeys"))
+		else if(flag.equalsIgnoreCase("getkeys"))
 		{
 			res.getOutputStream().write(keyJson.getBytes());
 			res.getOutputStream().flush();
@@ -248,6 +253,8 @@ public class OTServer extends HttpServlet
 
 		else
 		{
+			System.out.println("Wrong flag type : " + flag);
+			
 			String response = "wrong_flag_type";
 			res.getOutputStream().write(response.getBytes());
 			res.getOutputStream().flush();

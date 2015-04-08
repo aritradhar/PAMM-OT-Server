@@ -52,7 +52,7 @@ public class MakeDB
 		byte[] b = new byte[256];
 		String s = null;
 		
-		for(int i = 0; i < 10000; i++)
+		for(int i = 0; i < 200; i++)
 		{
 			rand.nextBytes(b);
 			s = Base64.encodeBase64URLSafeString(b);
