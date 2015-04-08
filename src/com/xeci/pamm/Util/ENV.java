@@ -14,4 +14,6 @@ public class ENV
 	
 	public static final String KEYBASE_EC_PK = "C:\\KeyBase\\EC_PK.key";
 	public static final String KEYBASE_EC_SK = "C:\\KeyBase\\EC_SK.key";
+	
+	public static final String STRING_DB = "C:\\String\\String.json";
 }

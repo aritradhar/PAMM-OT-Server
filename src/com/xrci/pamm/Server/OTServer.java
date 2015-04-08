@@ -24,7 +24,7 @@ import com.xeci.pamm.Util.ENV;
  * Servlet implementation class MainServlet
  */
 @WebServlet("/MainServlet")
-public class MainServlet extends HttpServlet 
+public class OTServer extends HttpServlet 
 {
 	private static final long serialVersionUID = 1L;
 
@@ -37,7 +37,7 @@ public class MainServlet extends HttpServlet
 
 	public static boolean loaded = false;
 
-	public MainServlet() throws IOException 
+	public OTServer() throws IOException 
 	{
 		super();
 
@@ -60,6 +60,8 @@ public class MainServlet extends HttpServlet
 		base64Keys = new String[jArray.length()];
 		bigIntegerKeys = new BigInteger[jArray.length()];
 
+		this.n_msg = jArray.length();
+		
 		for(int i = 0; i < jArray.length(); i++)
 		{
 			JSONObject ob = (JSONObject) jArray.get(i);
