@@ -22,12 +22,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PublicKey;
+import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Random;
@@ -59,12 +59,23 @@ public class ClientEngine
 	public BigInteger[] Enc;
 	public int choice;
 
+	public String random_token;
 	public PublicKey verifyKey;
 
 
 	public ClientEngine(int choice)
 	{
 		this.choice = choice;
+		
+		if(ENV.USE_SESSION_TOKEN)
+		{
+			byte[] tokenBytes = new byte[16];
+			SecureRandom rand = new SecureRandom();
+			rand.nextBytes(tokenBytes);
+			this.random_token = Base64.encodeBase64URLSafeString(tokenBytes);
+		}
+		else
+			this.random_token = null;
 	}
 
 	/*

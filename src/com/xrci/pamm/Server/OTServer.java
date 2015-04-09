@@ -151,10 +151,7 @@ public class OTServer extends HttpServlet
 		{
 			boolean end = false;
 			
-			if(!ENV.USE_SESSION_TOKEN)
-				end = UserList.endSession(ip, port);
-			else
-				end = UserList.endSession(random_token);
+			end = ENV.USE_SESSION_TOKEN ? UserList.endSession(random_token) : UserList.endSession(ip, port);
 			
 			if(!end)
 			{
@@ -219,10 +216,7 @@ public class OTServer extends HttpServlet
 			BigInteger[] X =  EvenGoldreichLempel.generateRandomMsg(n_msg, 4);
 			boolean status = false;
 			
-			if(!ENV.USE_SESSION_TOKEN)
-				status = UserList.putX(ip, port, X);
-			else
-				status = UserList.putX(random_token, X);
+			status = ENV.USE_SESSION_TOKEN ? UserList.putX(random_token, X) : UserList.putX(ip, port, X);
 
 			if(!status)
 			{
