@@ -32,7 +32,7 @@ import org.tukaani.xz.XZOutputStream;
 
 public class Utils 
 {
-	public static final int COMPRESSION_OPTION = 6;
+	public static final int COMPRESSION_OPTION = ENV.LZMA_TRAFFIC_COMPRESSION_LEVEL;
 	
 	public static BigInteger lcm(BigInteger a, BigInteger b)
 	{
