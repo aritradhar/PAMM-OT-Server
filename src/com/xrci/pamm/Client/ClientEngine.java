@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
@@ -38,10 +39,16 @@ import org.json.JSONObject;
 
 import com.crypto.EvenGoldreichLempel;
 import com.xrci.pamm.Util.*;
-import com.xrci.pamm.Util.ENV;
 
 public class ClientEngine 
 {
+	/*
+	 * client run from cmd
+	 * 
+		java -cp "C:\lib\Apache Commons\commons-codec-1.10.jar";"C:\Users\w4j3yyfd\git\JSON-java\bin";"C:\Users\w4j3yyfd\git\crypt\bin";C:\Users\w4j3yyfd\workspace\LZMA\bin;. com.xrci.pamm.Client.ClientEngine
+	 
+	 */
+	
 	private static String USER_AGENT = "Mozilla/5.0";
 	//private static String SERVER_ADDRESS = "http://localhost:9080/AdResponse/MainServlet";
 	private static String SERVER_ADDRESS = "http://localhost:8080/PAMM_OT_Server/MainServlet";
@@ -93,9 +100,13 @@ public class ClientEngine
 		CE.Decrypt();
 		System.out.println(Utils.bigIntegerToString(CE.Dec));
 		
+		CE.sessionEnd();
+		
 		long end = System.currentTimeMillis();
 		
 		System.out.println("Total time : " + (end - start) + " ms");
+		
+		
 		/*
 		 * not required
 		String keyString = Utils.bigIntegerToString(CE.Dec);
@@ -137,6 +148,30 @@ public class ClientEngine
 	}
 
 
+	public void sessionEnd() throws IOException
+	{
+		String url = SERVER_ADDRESS;
+		URL obj = new URL(url);
+		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+
+		con.setRequestMethod("POST");
+		con.setRequestProperty("User-Agent", USER_AGENT);
+		con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+
+		String urlParameters = "flag=endSession";
+
+		con.setDoOutput(true);
+		DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+		wr.writeBytes(urlParameters);
+		wr.flush();
+		wr.close();
+		
+		int responseCode = con.getResponseCode();
+		System.out.println("\nSending 'POST' request to URL : " + url);
+		System.out.println("Post parameters : " + urlParameters);
+		System.out.println("Response Code : " + responseCode);
+	}
+	
 	public BigInteger[] sendHandShake() throws IOException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException
 	{
 		String url = SERVER_ADDRESS;
