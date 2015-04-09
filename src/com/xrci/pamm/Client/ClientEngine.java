@@ -169,8 +169,8 @@ public class ClientEngine
 		con.setRequestProperty("User-Agent", USER_AGENT);
 		con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
 
-		String urlParameters = "flag=endSession";
-
+		String urlParameters = (ENV.USE_SESSION_TOKEN) ? "flag=endSession&token="+ random_token : "flag=endSession";
+		
 		con.setDoOutput(true);
 		DataOutputStream wr = new DataOutputStream(con.getOutputStream());
 		wr.writeBytes(urlParameters);
@@ -193,7 +193,7 @@ public class ClientEngine
 		con.setRequestProperty("User-Agent", USER_AGENT);
 		con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
 
-		String urlParameters = "flag=handshake";
+		String urlParameters = (ENV.USE_SESSION_TOKEN) ? "flag=handshake&token="+ random_token :"flag=handshake";
 
 		con.setDoOutput(true);
 		DataOutputStream wr = new DataOutputStream(con.getOutputStream());
@@ -250,7 +250,7 @@ public class ClientEngine
 		con.setRequestProperty("User-Agent", USER_AGENT);
 		con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
 
-		String urlParameters = "flag=otQuery&query=" + this.V;
+		String urlParameters = (ENV.USE_SESSION_TOKEN) ? "flag=otQuery&query=" + this.V + "&token=" + random_token : "flag=otQuery&query=" + this.V;
 
 		con.setDoOutput(true);
 		DataOutputStream wr = new DataOutputStream(con.getOutputStream());
@@ -323,7 +323,7 @@ public class ClientEngine
 		con.setRequestProperty("User-Agent", USER_AGENT);
 		con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
 
-		String urlParameters = "flag=otKeys";
+		String urlParameters = (ENV.USE_SESSION_TOKEN) ? "flag=otKeys&token="+ random_token : "flag=otKeys";
 
 		con.setDoOutput(true);
 		DataOutputStream wr = new DataOutputStream(con.getOutputStream());

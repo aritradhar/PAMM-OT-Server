@@ -101,11 +101,11 @@ public class OTServer extends HttpServlet
 		System.out.println("PORT : " + port);
 		System.out.println("FLAG : " + flag);
 		
-		String random_token = null;
+		String random_token = ENV.USE_SESSION_TOKEN ? request.getParameter("token") : null;
 		
 		if(ENV.USE_SESSION_TOKEN)
-			random_token = request.getParameter("token");
-
+			System.out.println("TOKEN : " + random_token);
+		
 		try 
 		{
 			System.out.println("Loaded key file " + loaded);

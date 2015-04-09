@@ -19,5 +19,5 @@ public class ENV
 	
 	public static final boolean TRAFFIC_COMPRESSION = false;
 	
-	public static final boolean USE_SESSION_TOKEN = false;
+	public static final boolean USE_SESSION_TOKEN = true;
 }
