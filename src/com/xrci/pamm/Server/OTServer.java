@@ -100,6 +100,11 @@ public class OTServer extends HttpServlet
 		System.out.println("IP : " + ip);
 		System.out.println("PORT : " + port);
 		System.out.println("FLAG : " + flag);
+		
+		String random_token = null;
+		
+		if(ENV.USE_SESSION_TOKEN)
+			random_token = request.getParameter("token");
 
 		try 
 		{
@@ -144,7 +149,13 @@ public class OTServer extends HttpServlet
 		//destroy all styates
 		if(flag.equalsIgnoreCase("endSession"))
 		{
-			boolean end = UserList.endSession(ip, port);
+			boolean end = false;
+			
+			if(!ENV.USE_SESSION_TOKEN)
+				end = UserList.endSession(ip, port);
+			else
+				end = UserList.endSession(random_token);
+			
 			if(!end)
 			{
 				String response = "invalid_rerquest";
@@ -168,16 +179,34 @@ public class OTServer extends HttpServlet
 		//send RSA n and e and Elliptic curve public key for signature
 		else if(flag.equalsIgnoreCase("handshake"))
 		{
-			if(UserList.getState(ip, port) > 0)
+			if(!ENV.USE_SESSION_TOKEN)
 			{
-				String response = "wrong_state";
-				res.getOutputStream().write(response.getBytes());
-				res.getOutputStream().flush();
-				res.getOutputStream().close();
-				return;
+				if(UserList.getState(ip, port) > 0)
+				{
+					String response = "wrong_state";
+					res.getOutputStream().write(response.getBytes());
+					res.getOutputStream().flush();
+					res.getOutputStream().close();
+					return;
+				}
+			}
+			else
+			{
+				if(UserList.getState(random_token) >0 )
+				{
+					String response = "wrong_state";
+					res.getOutputStream().write(response.getBytes());
+					res.getOutputStream().flush();
+					res.getOutputStream().close();
+					return;
+				}
 			}
 
-			UserList.setState(request.getRemoteAddr(), request.getRemotePort(), 1);
+			if(!ENV.USE_SESSION_TOKEN)
+				UserList.setState(request.getRemoteAddr(), request.getRemotePort(), 1);
+			else
+				UserList.setState(random_token, 1);
+			
 			String response = N.toString().concat("\n").concat(E.toString()).concat("\n").concat(verifyKey);
 			res.getOutputStream().write(response.getBytes());
 			res.getOutputStream().flush();
@@ -188,7 +217,12 @@ public class OTServer extends HttpServlet
 		else if(flag.equalsIgnoreCase("otKeys"))
 		{
 			BigInteger[] X =  EvenGoldreichLempel.generateRandomMsg(n_msg, 4);
-			boolean status = UserList.putX(ip, port, X);
+			boolean status = false;
+			
+			if(!ENV.USE_SESSION_TOKEN)
+				status = UserList.putX(ip, port, X);
+			else
+				status = UserList.putX(random_token, X);
 
 			if(!status)
 			{
@@ -213,8 +247,21 @@ public class OTServer extends HttpServlet
 			//{
 			BigInteger V = query;
 			//System.out.println("V " + V);
-			UserList.putQuery(ip, port, query);
-			BigInteger[] X = UserList.getX(ip, port);
+			
+			BigInteger[] X = null;
+			
+			if(!ENV.USE_SESSION_TOKEN)
+			{
+				UserList.putQuery(ip, port, query);
+				X = UserList.getX(ip, port);
+			}
+			else
+			{
+				UserList.putQuery(random_token, query);
+				X = UserList.getX(random_token);
+			}
+			
+			//BigInteger[] X = UserList.getX(ip, port);
 
 			if(X == null)
 			{

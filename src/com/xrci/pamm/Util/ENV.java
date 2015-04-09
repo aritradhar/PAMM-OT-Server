@@ -18,4 +18,6 @@ public class ENV
 	public static final String STRING_DB = "C:\\String\\String.json";
 	
 	public static final boolean TRAFFIC_COMPRESSION = false;
+	
+	public static final boolean USE_SESSION_TOKEN = false;
 }
