@@ -132,6 +132,7 @@ public class UserList
 		userStateMap.remove(address);
 		userXval.remove(address);
 		userQueryMap.remove(address);
+		userSharedSecretMap.remove(address);
 		
 		return true;
 	}
@@ -144,6 +145,7 @@ public class UserList
 		userStateMap.remove(address);
 		userXval.remove(address);
 		userQueryMap.remove(address);
+		userSharedSecretMap.remove(address);
 		
 		return true;
 	}
