@@ -32,6 +32,8 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Random;
 
+import javax.crypto.SecretKey;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
@@ -51,8 +53,8 @@ public class ClientEngine
 	
 	private static String USER_AGENT = "Mozilla/5.0";
 	//private static String SERVER_ADDRESS = "http://localhost:9080/AdResponse/MainServlet";
-	private static String SERVER_ADDRESS = //"http://localhost:8080/PAMM_OT_Server/MainServlet";
-			"http://localhost:8080/pammClient/MainServlet";
+	private static String SERVER_ADDRESS = "http://localhost:8080/PAMM_OT_Server/MainServlet";
+			//"http://localhost:8080/pammClient/MainServlet";
 	public BigInteger N, E;
 	public BigInteger[] X;
 	public BigInteger K,V, Dec;
@@ -61,10 +63,12 @@ public class ClientEngine
 	public int choice;
 
 	public String random_token;
-	public PublicKey verifyKey;
+	public byte[] serverPublicKey;
+	
+	private byte[] publicKey, privateKey, sharedKey;
+	private SecretKey sharedSecretKey;
 
-
-	public ClientEngine(int choice)
+	public ClientEngine(int choice) throws NoSuchAlgorithmException
 	{
 		this.choice = choice;
 		
@@ -77,6 +81,22 @@ public class ClientEngine
 		}
 		else
 			this.random_token = null;
+		
+		this.setKeys();
+		
+	}
+
+	private void setKeys() throws NoSuchAlgorithmException
+	{
+		byte[][] keys = CryptoUtils.generateECkeys();
+		this.publicKey = keys[0];
+		this.privateKey = keys[1];
+	}
+	
+	private void setSesson(byte[] serverPublickey) throws NoSuchAlgorithmException
+	{
+		this.sharedKey = CryptoUtils.generateSharedSecret(this.privateKey, serverPublickey);
+		this.sharedSecretKey = CryptoUtils.makeSecretKey(this.sharedKey);
 	}
 
 	/*
@@ -139,6 +159,14 @@ public class ClientEngine
 		System.out.println("Response Code : " + responseCode);
 	}
 	
+	/**
+	 * Initialize a new connection
+	 * @return
+	 * @throws IOException
+	 * @throws NoSuchAlgorithmException
+	 * @throws NoSuchProviderException
+	 * @throws InvalidKeySpecException
+	 */
 	public BigInteger[] sendHandShake() throws IOException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException
 	{
 		String url = SERVER_ADDRESS;
@@ -150,7 +178,8 @@ public class ClientEngine
 		con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
 
 		String urlParameters = (ENV.USE_SESSION_TOKEN) ? "flag=handshake&token="+ random_token :"flag=handshake";
-
+		urlParameters += "&publicKey=" + Base64.encodeBase64URLSafeString(this.publicKey);
+		
 		con.setDoOutput(true);
 		DataOutputStream wr = new DataOutputStream(con.getOutputStream());
 		wr.writeBytes(urlParameters);
@@ -182,14 +211,15 @@ public class ClientEngine
 			
 			if(counter == 3)
 			{
-				byte[] pk_byte = Base64.decodeBase64(inputLine);
-				KeyFactory kf = KeyFactory.getInstance("EC", "SunEC");
-				this.verifyKey = kf.generatePublic(new X509EncodedKeySpec(pk_byte));			
+				this.serverPublicKey = Base64.decodeBase64(inputLine);	
+				this.setSesson(serverPublicKey);
 			}
 		}
 		System.out.println("N : " + N);
 		System.out.println("E : " + E);
-		System.out.println("Verify key : " + this.verifyKey.toString());
+		System.out.println("Server Public key : " + Base64.encodeBase64URLSafeString(this.serverPublicKey));
+		System.out.println("Shared secret key : " + Base64.encodeBase64URLSafeString(this.sharedKey));
+		
 		in.close();
 
 		return new BigInteger[]{N, E};
@@ -226,7 +256,7 @@ public class ClientEngine
 		//long st = System.currentTimeMillis();
 		
 		if(!ENV.TRAFFIC_COMPRESSION)
-		in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+			in = new BufferedReader(new InputStreamReader(con.getInputStream()));
 		
 		else
 		{
@@ -268,6 +298,11 @@ public class ClientEngine
 
 	}
 
+	/**
+	 * 2nd step
+	 * @return
+	 * @throws IOException
+	 */
 	public BigInteger[] sendOTKeys() throws IOException 
 	{
 

@@ -89,9 +89,10 @@ public class CryptoUtils
 	public static byte[][] generateSharedSecret(byte[] otherPublicKey) throws NoSuchAlgorithmException
 	{
 		Curve25519 cipher = Curve25519.getInstance(Curve25519.BEST);
-		Curve25519KeyPair kp = cipher.generateKeyPair();
-		byte[] publicKey = kp.getPublicKey();
-		byte[] privateKey = kp.getPrivateKey();
+		
+		byte[][] keys = generateECkeys();
+		byte[] publicKey = keys[0];
+		byte[] privateKey = keys[1];
 		byte[] sharedSecret = cipher.calculateAgreement(otherPublicKey, privateKey);
 		
 		MessageDigest md = MessageDigest.getInstance("SHA-512");
@@ -100,6 +101,37 @@ public class CryptoUtils
 		System.arraycopy(digest, 0, sharedKey, 0, 32);
 		
 		return new byte[][]{publicKey, privateKey, sharedKey};		
+	}
+	
+	/**
+	 * 
+	 * @param selfPrivateKey
+	 * @param otherPublicKey
+	 * @return shared secret (directly to be used in AES 256)
+	 * @throws NoSuchAlgorithmException 
+	 */
+	public static byte[] generateSharedSecret(byte[] selfPrivateKey, byte[] otherPublicKey) throws NoSuchAlgorithmException
+	{
+		Curve25519 cipher = Curve25519.getInstance(Curve25519.BEST);
+		byte[] sharedSecret = cipher.calculateAgreement(otherPublicKey, selfPrivateKey);
+		
+		MessageDigest md = MessageDigest.getInstance("SHA-512");
+		byte[] digest = md.digest(sharedSecret);
+		byte[] sharedKey = new byte[32];
+		System.arraycopy(digest, 0, sharedKey, 0, 32);
+		
+		return sharedKey;
+	}
+	
+	/**
+	 *  @return new public key and private key
+	 */
+	public static byte[][] generateECkeys()
+	{
+		Curve25519 cipher = Curve25519.getInstance(Curve25519.BEST);
+		Curve25519KeyPair kp = cipher.generateKeyPair();
+		
+		return new byte[][]{kp.getPublicKey(), kp.getPrivateKey()};
 	}
 	
 	public static SecretKey makeSecretKey(byte[] key)

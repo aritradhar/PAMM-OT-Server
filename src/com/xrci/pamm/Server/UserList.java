@@ -25,16 +25,16 @@ import com.xrci.pamm.Util.*;;
 public class UserList 
 {
 	// keep address (IP |$| PORT) and the state
-	public static ConcurrentHashMap<String, Integer> userStateMap = new ConcurrentHashMap<>();
+	private static ConcurrentHashMap<String, Integer> userStateMap = new ConcurrentHashMap<>();
 	
 	// keep address (IP |$| PORT) and randomly generated X
-	public static ConcurrentHashMap<String, BigInteger[]> userXval = new ConcurrentHashMap<String, BigInteger[]>();
+	private static ConcurrentHashMap<String, BigInteger[]> userXval = new ConcurrentHashMap<String, BigInteger[]>();
 	
 	//keep address (IP |$| PORT) and user query
-	public static ConcurrentHashMap<String, BigInteger> userQueryMap = new ConcurrentHashMap<String, BigInteger>();
+	private static ConcurrentHashMap<String, BigInteger> userQueryMap = new ConcurrentHashMap<String, BigInteger>();
 	
 	//keep address (IP |$| PORT) and shared secret with the user
-	public static ConcurrentHashMap<String, SecretKey> userSharedSecretMap = new ConcurrentHashMap<String, SecretKey>();
+	private static ConcurrentHashMap<String, SecretKey> userSharedSecretMap = new ConcurrentHashMap<String, SecretKey>();
 	/*
 	 * address at the argument is the random token to maintain state
 	 */

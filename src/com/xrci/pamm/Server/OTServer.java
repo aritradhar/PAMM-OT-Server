@@ -20,6 +20,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -27,12 +28,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.codec.binary.Base64;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.crypto.EvenGoldreichLempel;
 import com.xrci.pamm.Util.*;
-import com.xrci.pamm.Util.ENV;
 
 
 /**
@@ -49,7 +50,7 @@ public class OTServer extends HttpServlet
 	public static String[] base64Keys;
 	//strings converted to biginteger number
 	public static BigInteger[] bigIntegerKeys;
-	public static String signKey, verifyKey;
+	public static byte[] privateKey, publicKey;
 
 	public static boolean loaded = false;
 
@@ -137,8 +138,8 @@ public class OTServer extends HttpServlet
 				D = new BigInteger(brD.readLine());
 				E = new BigInteger(brE.readLine());
 				
-				signKey = brSignKey.readLine();
-				verifyKey = brVerifyKey.readLine();
+				privateKey = Base64.decodeBase64(brSignKey.readLine());
+				publicKey = Base64.decodeBase64(brVerifyKey.readLine());
 
 				brN.close();
 				brD.close();
@@ -214,11 +215,40 @@ public class OTServer extends HttpServlet
 			}
 
 			if(!ENV.USE_SESSION_TOKEN)
+			{
 				UserList.setState(request.getRemoteAddr(), request.getRemotePort(), 1);
+				String otherPublicKey = request.getParameter("publicKey");
+				try 
+				{
+					byte[] sharedSecret = CryptoUtils.generateSharedSecret(privateKey, Base64.decodeBase64(otherPublicKey));
+					UserList.setSharedSecret(request.getRemoteAddr(), request.getRemotePort(), sharedSecret);
+				} 
+				
+				catch (NoSuchAlgorithmException e) 
+				{
+					e.printStackTrace();
+				}
+			}
 			else
+			{
 				UserList.setState(random_token, 1);
+				String otherPublicKey = request.getParameter("publicKey");
+				try 
+				{
+					byte[] sharedSecret = CryptoUtils.generateSharedSecret(privateKey, Base64.decodeBase64(otherPublicKey));
+					UserList.setSharedSecret(random_token, sharedSecret);
+					
+					System.out.println("Shared secret "+Base64.encodeBase64URLSafeString(UserList.getSharedSecret(random_token).getEncoded()));
+				} 
+				
+				catch (NoSuchAlgorithmException e) 
+				{
+					e.printStackTrace();
+				}
+			}
 			
-			String response = N.toString().concat("\n").concat(E.toString()).concat("\n").concat(verifyKey);
+			
+			String response = N.toString().concat("\n").concat(E.toString()).concat("\n").concat(Base64.encodeBase64URLSafeString(publicKey));
 			res.getOutputStream().write(response.getBytes());
 			res.getOutputStream().flush();
 			res.getOutputStream().close();
