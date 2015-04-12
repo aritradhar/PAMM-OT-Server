@@ -18,6 +18,8 @@ package com.xrci.pamm.Server;
 import java.math.BigInteger;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import com.xrci.pamm.Util.*;;
 
 public class UserList 
@@ -31,9 +33,53 @@ public class UserList
 	//keep address (IP |$| PORT) and user query
 	public static ConcurrentHashMap<String, BigInteger> userQueryMap = new ConcurrentHashMap<String, BigInteger>();
 	
+	//keep address (IP |$| PORT) and shared secret with the user
+	public static ConcurrentHashMap<String, SecretKey> userSharedSecretMap = new ConcurrentHashMap<String, SecretKey>();
 	/*
 	 * address at the argument is the random token to maintain state
 	 */
+	
+	public static void setSharedSecret(String ip, int port, byte[] sharedSecret)
+	{
+		String address = Utils.makeAddress(ip, port);
+		SecretKey sec = new SecretKeySpec(sharedSecret, "AES");
+		
+		if(!userSharedSecretMap.containsKey(address))
+		{
+			userSharedSecretMap.put(address, sec);
+		}
+		else
+		{
+			userSharedSecretMap.put(address, sec);
+		}
+	}
+	
+	public static void setSharedSecret(String address, byte[] sharedSecret)
+	{
+		SecretKey sec = new SecretKeySpec(sharedSecret, "AES");
+		
+		if(!userSharedSecretMap.containsKey(address))
+		{
+			userSharedSecretMap.put(address, sec);
+		}
+		else
+		{
+			userSharedSecretMap.put(address, sec);
+		}
+	}
+	
+	public static SecretKey getSharedSecret(String ip, int port)
+	{
+		String address = Utils.makeAddress(ip, port);
+		
+		return userSharedSecretMap.get(address);
+	}
+	
+	public static SecretKey getSharedSecret(String address)
+	{
+		return userSharedSecretMap.get(address);
+	}
+	
 	
 	public static void setState(String ip, int port, int state)
 	{

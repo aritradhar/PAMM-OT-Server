@@ -27,7 +27,6 @@ import com.xrci.pamm.Util.ENV;
 public class OTServer extends HttpServlet 
 {
 	private static final long serialVersionUID = 1L;
-
 	public static BigInteger N,D,E;	
 	int n_msg;
 	public static String keyJson;

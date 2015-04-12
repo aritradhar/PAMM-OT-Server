@@ -6,7 +6,7 @@ public class ENV
 	public static final String dbName = "pamm";
 	public static final String driver = "com.mysql.jdbc.Driver";
 	public static final String userName = "root"; 
-	public static final String password = "";
+	public static final String password = "root";
 	
 	public static final String KEYBASE_N = "C:\\KeyBase\\N.key";
 	public static final String KEYBASE_D = "C:\\KeyBase\\D.key";
