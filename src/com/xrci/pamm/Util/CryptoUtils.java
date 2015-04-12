@@ -66,6 +66,49 @@ public class CryptoUtils
 		return new byte[][]{c.doFinal(plainText), iv};
 	}
 	
+	/**
+	 * AES encryption
+	 * @param plainText
+	 * @param key {@code byte array} type
+	 * @return cipher text and IV
+	 * @throws NoSuchAlgorithmException
+	 * @throws NoSuchPaddingException
+	 * @throws InvalidKeyException
+	 * @throws InvalidAlgorithmParameterException
+	 * @throws IllegalBlockSizeException
+	 * @throws BadPaddingException
+	 */
+	public static byte[][] encAES(byte[] plainText, SecretKey key) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException
+	{
+		if(key.getEncoded().length != 32)
+			throw new RuntimeException("Invalid key size, only AES 256 is allowed");
+		
+		SecureRandom rand = new SecureRandom();
+		
+		Cipher c = Cipher.getInstance("AES/CBC/PKCS5Padding");
+		byte[] iv = new byte[16];
+		rand.nextBytes(iv);
+		
+		IvParameterSpec ivSpec = new IvParameterSpec(iv);
+		
+		c.init(Cipher.ENCRYPT_MODE, key, ivSpec);
+	
+		return new byte[][]{c.doFinal(plainText), iv};
+	}
+	
+	/**
+	 * 
+	 * @param cipherText
+	 * @param key
+	 * @param iv
+	 * @return
+	 * @throws NoSuchAlgorithmException
+	 * @throws NoSuchPaddingException
+	 * @throws InvalidKeyException
+	 * @throws InvalidAlgorithmParameterException
+	 * @throws IllegalBlockSizeException
+	 * @throws BadPaddingException
+	 */
 	public static byte[] decAES(byte[] cipherText, byte[] key, byte[] iv) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException
 	{
 		if(key.length != 32)
@@ -76,6 +119,32 @@ public class CryptoUtils
 		SecretKey sec = new SecretKeySpec(key, "AES");
 		
 		c.init(Cipher.DECRYPT_MODE, sec, ivSpec);
+		
+		return c.doFinal(cipherText);
+	}
+	
+	/**
+	 * AES decryption
+	 * @param cipherText
+	 * @param key {@code SecretKey} object
+	 * @param iv
+	 * @return Decrypted plain text
+	 * @throws NoSuchAlgorithmException
+	 * @throws NoSuchPaddingException
+	 * @throws InvalidKeyException
+	 * @throws InvalidAlgorithmParameterException
+	 * @throws IllegalBlockSizeException
+	 * @throws BadPaddingException
+	 */
+	public static byte[] decAES(byte[] cipherText,SecretKey key, byte[] iv) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException
+	{
+		if(key.getEncoded().length != 32)
+			throw new RuntimeException("Invalid key size, only AES 256 is allowed");
+		
+		Cipher c = Cipher.getInstance("AES/CBC/PKCS5Padding");
+		IvParameterSpec ivSpec = new IvParameterSpec(iv);	
+		
+		c.init(Cipher.DECRYPT_MODE, key, ivSpec);
 		
 		return c.doFinal(cipherText);
 	}

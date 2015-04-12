@@ -20,8 +20,14 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -271,10 +277,50 @@ public class OTServer extends HttpServlet
 			}
 
 			JSONObject X_Json = Utils.putInJSON(X);
-
-			res.getOutputStream().write(X_Json.toString(2).getBytes());
-			res.getOutputStream().flush();
-			res.getOutputStream().close();
+			byte[] json_bytes = X_Json.toString(2).getBytes();
+			SecretKey sec = UserList.getSharedSecret(random_token);
+			
+			if(sec == null)
+			{
+				res.getOutputStream().write("Missing shared secret".getBytes());
+				res.getOutputStream().flush();
+				res.getOutputStream().close();
+				return;
+			}
+			
+			try 
+			{
+				byte[][] enc = CryptoUtils.encAES(json_bytes, sec);
+				byte[] iv = enc[1];
+				byte[] cipherText = enc[0];
+			
+				//System.out.println(iv.length + cipherText.length);
+				//iv | cipher text
+				byte[] out = new byte[iv.length + cipherText.length];
+				System.arraycopy(iv, 0, out, 0, 16);
+				System.arraycopy(cipherText, 0, out, 16, cipherText.length);
+				
+				res.getOutputStream().write(out);
+				res.getOutputStream().flush();
+				res.getOutputStream().close();
+				
+			} 
+			catch (InvalidKeyException | NoSuchAlgorithmException
+					| NoSuchPaddingException
+					| InvalidAlgorithmParameterException
+					| IllegalBlockSizeException | BadPaddingException e) 
+			
+			{
+				e.printStackTrace();
+				
+				res.getOutputStream().write("Problem with shared key".getBytes());
+				res.getOutputStream().flush();
+				res.getOutputStream().close();
+			}
+			
+//			res.getOutputStream().write(X_Json.toString(2).getBytes());
+//			res.getOutputStream().flush();
+//			res.getOutputStream().close();
 		}
 
 		else if(flag.equalsIgnoreCase("otQuery"))
@@ -325,15 +371,17 @@ public class OTServer extends HttpServlet
 			//res.getOutputStream().write(enc_Json.toString(2).getBytes());
 			//long st = System.currentTimeMillis();
 			
+			byte[] out = null;
+
 			if(!ENV.TRAFFIC_COMPRESSION)
-				res.getOutputStream().write(enc_Json.toString(2).getBytes());
-			
+				out = enc_Json.toString(2).getBytes();		
 			else
-				res.getOutputStream().write(Utils.LZMA_ZIP(enc_Json.toString(2).getBytes()));
+				out =Utils.LZMA_ZIP(enc_Json.toString(2).getBytes());
 			
 			//long en = System.currentTimeMillis();
 			//System.out.println("Encode time : " + (en - st));
 			
+			res.getOutputStream().write(out);
 			res.getOutputStream().flush();
 			res.getOutputStream().close();
 			

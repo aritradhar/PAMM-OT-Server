@@ -23,6 +23,8 @@ import java.io.InputStreamReader;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -30,8 +32,12 @@ import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.Arrays;
 import java.util.Random;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 
 import org.apache.commons.codec.binary.Base64;
@@ -226,6 +232,11 @@ public class ClientEngine
 	}
 
 	//get enc data
+	/**
+	 * 3rd and final step. get enc data
+	 * @return
+	 * @throws IOException
+	 */
 	public BigInteger[] sendOTQuery() throws IOException
 	{
 		String url = SERVER_ADDRESS;
@@ -260,7 +271,7 @@ public class ClientEngine
 		
 		else
 		{
-			byte[] data = Utils.LZMA_UNZIP( IOUtils.toByteArray(con.getInputStream()));
+			byte[] data = Utils.LZMA_UNZIP(IOUtils.toByteArray(con.getInputStream()));
 			in = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(data)));
 		}
 		
@@ -302,8 +313,14 @@ public class ClientEngine
 	 * 2nd step
 	 * @return
 	 * @throws IOException
+	 * @throws BadPaddingException 
+	 * @throws IllegalBlockSizeException 
+	 * @throws InvalidAlgorithmParameterException 
+	 * @throws NoSuchPaddingException 
+	 * @throws NoSuchAlgorithmException 
+	 * @throws InvalidKeyException 
 	 */
-	public BigInteger[] sendOTKeys() throws IOException 
+	public BigInteger[] sendOTKeys() throws IOException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException 
 	{
 
 		String url = SERVER_ADDRESS;
@@ -328,8 +345,15 @@ public class ClientEngine
 		System.out.println("Post parameters : " + urlParameters);
 		System.out.println("Response Code : " + responseCode);
 
-		BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-
+		
+		byte[] bytes =  IOUtils.toByteArray(con.getInputStream());
+		byte[] iv = new byte[16];
+		System.arraycopy(bytes, 0, iv, 0, 16);
+		byte[] cipherText = Arrays.copyOfRange(bytes, 16, bytes.length);
+		byte[] pt = CryptoUtils.decAES(cipherText, this.sharedSecretKey, iv);
+		
+		BufferedReader in = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(pt)));
+		
 		String inputLine;
 		StringBuffer inputJSON = new StringBuffer("");
 
