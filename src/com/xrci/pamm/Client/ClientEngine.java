@@ -236,8 +236,14 @@ public class ClientEngine
 	 * 3rd and final step. get enc data
 	 * @return
 	 * @throws IOException
+	 * @throws BadPaddingException 
+	 * @throws IllegalBlockSizeException 
+	 * @throws InvalidAlgorithmParameterException 
+	 * @throws NoSuchPaddingException 
+	 * @throws NoSuchAlgorithmException 
+	 * @throws InvalidKeyException 
 	 */
-	public BigInteger[] sendOTQuery() throws IOException
+	public BigInteger[] sendOTQuery() throws IOException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException
 	{
 		String url = SERVER_ADDRESS;
 		URL obj = new URL(url);
@@ -266,12 +272,20 @@ public class ClientEngine
 		
 		//long st = System.currentTimeMillis();
 		
+		//AES decryption then unzip
+		byte[] bytes =  IOUtils.toByteArray(con.getInputStream());
+		byte[] iv = new byte[16];
+		System.arraycopy(bytes, 0, iv, 0, 16);
+		byte[] cipherText = Arrays.copyOfRange(bytes, 16, bytes.length);
+		byte[] pt = CryptoUtils.decAES(cipherText, this.sharedSecretKey, iv);
+		
+		
 		if(!ENV.TRAFFIC_COMPRESSION)
-			in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+			in = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(pt)));
 		
 		else
 		{
-			byte[] data = Utils.LZMA_UNZIP(IOUtils.toByteArray(con.getInputStream()));
+			byte[] data = Utils.LZMA_UNZIP(pt);
 			in = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(data)));
 		}
 		

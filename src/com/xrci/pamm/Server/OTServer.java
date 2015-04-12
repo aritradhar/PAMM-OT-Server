@@ -371,20 +371,65 @@ public class OTServer extends HttpServlet
 			//res.getOutputStream().write(enc_Json.toString(2).getBytes());
 			//long st = System.currentTimeMillis();
 			
-			byte[] out = null;
+			byte[] bytes = null;
 
 			if(!ENV.TRAFFIC_COMPRESSION)
-				out = enc_Json.toString(2).getBytes();		
+				bytes = enc_Json.toString(2).getBytes();		
 			else
-				out =Utils.LZMA_ZIP(enc_Json.toString(2).getBytes());
+				bytes =Utils.LZMA_ZIP(enc_Json.toString(2).getBytes());
 			
-			//long en = System.currentTimeMillis();
-			//System.out.println("Encode time : " + (en - st));
+			/*
+			 * long en = System.currentTimeMillis();
+			 * System.out.println("Encode time : " + (en - st));
+			 * */
 			
-			res.getOutputStream().write(out);
+			SecretKey sec = UserList.getSharedSecret(random_token);
+			
+			if(sec == null)
+			{
+				res.getOutputStream().write("Missing shared secret".getBytes());
+				res.getOutputStream().flush();
+				res.getOutputStream().close();
+				return;
+			}
+			
+			try 
+			{
+				byte[][] aes_enc = CryptoUtils.encAES(bytes, sec);
+				byte[] iv = aes_enc[1];
+				byte[] cipherText = aes_enc[0];
+			
+				//System.out.println(iv.length + cipherText.length);
+				//iv | cipher text
+				byte[] out = new byte[iv.length + cipherText.length];
+				System.arraycopy(iv, 0, out, 0, 16);
+				System.arraycopy(cipherText, 0, out, 16, cipherText.length);
+				
+				res.getOutputStream().write(out);
+				res.getOutputStream().flush();
+				res.getOutputStream().close();
+				
+			} 
+			catch (InvalidKeyException | NoSuchAlgorithmException
+					| NoSuchPaddingException
+					| InvalidAlgorithmParameterException
+					| IllegalBlockSizeException | BadPaddingException e) 
+			
+			{
+				e.printStackTrace();
+				
+				res.getOutputStream().write("Problem with shared key".getBytes());
+				res.getOutputStream().flush();
+				res.getOutputStream().close();
+				
+				return;
+			}
+			
+			/*
+			res.getOutputStream().write(bytes);
 			res.getOutputStream().flush();
 			res.getOutputStream().close();
-			
+			*/
 			//System.out.println("here");
 			//}
 
