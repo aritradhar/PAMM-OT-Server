@@ -167,7 +167,7 @@ public class OTServer extends HttpServlet
 		//System.out.println("D " + D);
 		//System.out.println("E " + E);
 
-		//destroy all styates
+		//destroy all states
 		if(flag.equalsIgnoreCase("endSession"))
 		{
 			boolean end = false;
@@ -176,6 +176,7 @@ public class OTServer extends HttpServlet
 			
 			if(!end)
 			{
+				System.err.println("Invalid request for client " + random_token);
 				String response = "invalid_rerquest";
 				res.getOutputStream().write(response.getBytes());
 				res.getOutputStream().flush();
@@ -184,6 +185,7 @@ public class OTServer extends HttpServlet
 			}
 			else
 			{
+				System.err.println("Session end request for client " + random_token);
 				String response = "session_end";
 				res.getOutputStream().write(response.getBytes());
 				res.getOutputStream().flush();
@@ -201,6 +203,7 @@ public class OTServer extends HttpServlet
 			{
 				if(UserList.getState(ip, port) > 0)
 				{
+					System.err.print("Wrong state. Client rejected " + random_token);
 					String response = "wrong_state";
 					res.getOutputStream().write(response.getBytes());
 					res.getOutputStream().flush();
@@ -212,6 +215,7 @@ public class OTServer extends HttpServlet
 			{
 				if(UserList.getState(random_token) >0 )
 				{
+					System.err.print("Wrong state. Client rejected " + random_token);
 					String response = "wrong_state";
 					res.getOutputStream().write(response.getBytes());
 					res.getOutputStream().flush();
@@ -219,15 +223,28 @@ public class OTServer extends HttpServlet
 					return;
 				}
 			}
-
+			String otherPublicKey = request.getParameter("publicKey");
+			String signature = request.getParameter("signature");
+			
+			if(!CryptoUtils.verifySignature(otherPublicKey, signature, Base64.decodeBase64(otherPublicKey)))
+			{
+				System.err.println("Signature mismatch. Client rejected " + random_token);
+				res.getOutputStream().write("SignatureMismatch".getBytes());
+				res.getOutputStream().flush();
+				res.getOutputStream().close();
+				return;
+			}
+			else
+				System.err.print("Signature verified " + signature);
+			
 			if(!ENV.USE_SESSION_TOKEN)
 			{
 				UserList.setState(request.getRemoteAddr(), request.getRemotePort(), 1);
-				String otherPublicKey = request.getParameter("publicKey");
+				UserList.setPublicKey(ip, port, Base64.decodeBase64(otherPublicKey));
 				try 
 				{
 					byte[] sharedSecret = CryptoUtils.generateSharedSecret(privateKey, Base64.decodeBase64(otherPublicKey));
-					UserList.setSharedSecret(request.getRemoteAddr(), request.getRemotePort(), sharedSecret);
+					UserList.setSharedSecret(ip, port, sharedSecret);
 				} 
 				
 				catch (NoSuchAlgorithmException e) 
@@ -238,7 +255,8 @@ public class OTServer extends HttpServlet
 			else
 			{
 				UserList.setState(random_token, 1);
-				String otherPublicKey = request.getParameter("publicKey");
+				
+				UserList.setPublicKey(random_token, Base64.decodeBase64(otherPublicKey));
 				try 
 				{
 					byte[] sharedSecret = CryptoUtils.generateSharedSecret(privateKey, Base64.decodeBase64(otherPublicKey));
@@ -252,6 +270,8 @@ public class OTServer extends HttpServlet
 					e.printStackTrace();
 				}
 			}
+			
+			
 			
 			
 			String response = N.toString().concat("\n").concat(E.toString()).concat("\n").concat(Base64.encodeBase64URLSafeString(publicKey));

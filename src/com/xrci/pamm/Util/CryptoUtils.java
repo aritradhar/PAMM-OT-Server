@@ -29,6 +29,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.apache.commons.codec.binary.Base64;
 import org.whispersystems.curve25519.Curve25519;
 import org.whispersystems.curve25519.Curve25519KeyPair;
 
@@ -192,6 +193,18 @@ public class CryptoUtils
 		return sharedKey;
 	}
 	
+	public static String generateSignature(String data, byte[] privateKey)
+	{
+		Curve25519 cipher = Curve25519.getInstance(Curve25519.BEST);
+		return Base64.encodeBase64URLSafeString(cipher.calculateSignature(privateKey, data.getBytes()));
+	}
+	
+	public static boolean verifySignature(String data, String signature, byte[] publicKey)
+	{
+		Curve25519 cipher = Curve25519.getInstance(Curve25519.BEST);
+		return cipher.verifySignature(publicKey, data.getBytes(), Base64.decodeBase64(signature));
+	}
+	
 	/**
 	 *  @return new public key and private key
 	 */
@@ -211,3 +224,4 @@ public class CryptoUtils
 		return new SecretKeySpec(key, "AES");	
 	}
 }
+;

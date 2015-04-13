@@ -35,9 +35,40 @@ public class UserList
 	
 	//keep address (IP |$| PORT) and shared secret with the user
 	private static ConcurrentHashMap<String, SecretKey> userSharedSecretMap = new ConcurrentHashMap<String, SecretKey>();
+	
+	//keep address (IP |$| PORT) and the user public key
+	private static ConcurrentHashMap<String, byte[]> userPublicKeyMap = new ConcurrentHashMap<String, byte[]>();
+		
+	
 	/*
 	 * address at the argument is the random token to maintain state
 	 */
+	
+	public static void setPublicKey(String ip, int port, byte[] publicKey)
+	{
+		String address = Utils.makeAddress(ip, port);
+		
+		if(!userPublicKeyMap.containsKey(address))
+		{
+			userPublicKeyMap.put(address, publicKey);
+		}
+		else
+		{
+			userPublicKeyMap.put(address, publicKey);
+		}
+	}
+	
+	public static void setPublicKey(String address, byte[] publicKey)
+	{		
+		if(!userPublicKeyMap.containsKey(address))
+		{
+			userPublicKeyMap.put(address, publicKey);
+		}
+		else
+		{
+			userPublicKeyMap.put(address, publicKey);
+		}
+	}
 	
 	public static void setSharedSecret(String ip, int port, byte[] sharedSecret)
 	{

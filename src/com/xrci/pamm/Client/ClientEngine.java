@@ -59,8 +59,11 @@ public class ClientEngine
 	
 	private static String USER_AGENT = "Mozilla/5.0";
 	//private static String SERVER_ADDRESS = "http://localhost:9080/AdResponse/MainServlet";
+	
 	private static String SERVER_ADDRESS = "http://localhost:8080/PAMM_OT_Server/MainServlet";
 			//"http://localhost:8080/pammClient/MainServlet";
+			//"http://13.218.151.91:9080/PAMM_OT_Server/MainServlet";
+	
 	public BigInteger N, E;
 	public BigInteger[] X;
 	public BigInteger K,V, Dec;
@@ -112,7 +115,7 @@ public class ClientEngine
 	{
 		long start = System.currentTimeMillis();
 		
-		int choice = new Random().nextInt(100);
+		int choice = new Random().nextInt(200);
 		System.out.println("choice" + choice);
 		ClientEngine CE = new ClientEngine(choice);
 		BigInteger[] out = CE.sendHandShake();
@@ -183,8 +186,11 @@ public class ClientEngine
 		con.setRequestProperty("User-Agent", USER_AGENT);
 		con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
 
+		String sentKey = Base64.encodeBase64URLSafeString(this.publicKey);
+		String sig = CryptoUtils.generateSignature(sentKey, privateKey);
+		
 		String urlParameters = (ENV.USE_SESSION_TOKEN) ? "flag=handshake&token="+ random_token :"flag=handshake";
-		urlParameters += "&publicKey=" + Base64.encodeBase64URLSafeString(this.publicKey);
+		urlParameters += "&publicKey=" + sentKey + "&signature=" + sig;
 		
 		con.setDoOutput(true);
 		DataOutputStream wr = new DataOutputStream(con.getOutputStream());
@@ -198,20 +204,25 @@ public class ClientEngine
 		System.out.println("Post parameters : " + urlParameters);
 		System.out.println("Response Code : " + responseCode);
 
-		BufferedReader in = new BufferedReader(
-				new InputStreamReader(con.getInputStream()));
+		BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
 		String inputLine;
 
 		int counter = 0;
-		BigInteger N = BigInteger.ZERO, E = BigInteger.ZERO;
-
+		BigInteger N = BigInteger.ZERO, E = BigInteger.ZERO;		
+		
 		while ((inputLine = in.readLine()) != null) 
 		{
 			++counter;
 
 			if(counter == 1)
+			{
+				if(inputLine.equalsIgnoreCase("SignatureMismatch"))
+				{
+					System.err.println("Signature mismatch in server");
+					System.exit(1);
+				}
 				N = new BigInteger(inputLine);
-
+			}
 			if(counter == 2)
 				E = new BigInteger(inputLine);
 			

@@ -34,7 +34,7 @@ public class PopulateJson
 	{
 		Class.forName(ENV.driver).newInstance();
 		Connection conn = DriverManager.getConnection(ENV.url+ENV.dbName,ENV.userName,ENV.password);
-
+		FileWriter fwC = new FileWriter(ENV.STRING_DB_counter);
 
 		String sql = "SELECT string from adv";
 
@@ -58,6 +58,10 @@ public class PopulateJson
 			
 			i++;
 		}
+		
+		//System.out.println(i);
+		fwC.write(i);
+		fwC.close();
 		
 		MAIN.put("StringDB", jArray);
 		

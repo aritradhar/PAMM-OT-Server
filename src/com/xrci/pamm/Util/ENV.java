@@ -3,7 +3,7 @@ package com.xrci.pamm.Util;
 public class ENV 
 {
 	public static final String url = "jdbc:mysql://localhost:3306/";
-	public static final String dbName = "pamm";
+	public static final String dbName = "pamm?rewriteBatchedStatements=true";
 	public static final String driver = "com.mysql.jdbc.Driver";
 	public static final String userName = "root"; 
 	public static final String password = "root";
@@ -16,6 +16,7 @@ public class ENV
 	public static final String KEYBASE_EC_SK = "C:\\KeyBase\\EC_SK.key";
 	
 	public static final String STRING_DB = "C:\\String\\String.json";
+	public static final String STRING_DB_counter = "C:\\String\\Counter.txt";
 	
 	public static final boolean TRAFFIC_COMPRESSION = false;
 	public static final int LZMA_TRAFFIC_COMPRESSION_LEVEL = 1;
