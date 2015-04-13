@@ -22,16 +22,15 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.URL;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
-import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
-import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
-import java.security.spec.X509EncodedKeySpec;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -108,42 +107,42 @@ public class ClientEngine
 		this.sharedSecretKey = CryptoUtils.makeSecretKey(this.sharedKey);
 	}
 
-	/*
-	 * Test main
-	 */
-	public static void main(String[] args) throws Exception 
+	public static int queryRowNumber() throws IOException
 	{
-		long start = System.currentTimeMillis();
+		String url = SERVER_ADDRESS;
+		URL obj = new URL(url);
+		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+
+		con.setRequestMethod("POST");
+		con.setRequestProperty("User-Agent", USER_AGENT);
+		con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+
+		String urlParameters = "flag=rowNum";
 		
-		int choice = new Random().nextInt(200);
-		System.out.println("choice" + choice);
-		ClientEngine CE = new ClientEngine(choice);
-		BigInteger[] out = CE.sendHandShake();
-
-		CE.N = out[0];
-		CE.E = out[1];
-
-		CE.X = CE.sendOTKeys();
-
-		BigInteger[] KV =  EvenGoldreichLempel.generateQuery(CE.choice, CE.X, CE.N, CE.E);
-		CE.K = KV[0];
-		CE.V = KV[1];
-
-		CE.Enc = CE.sendOTQuery();
-
-		CE.Decrypt();
-		System.out.println(Utils.bigIntegerToString(CE.Dec));
+		con.setDoOutput(true);
+		DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+		wr.writeBytes(urlParameters);
+		wr.flush();
+		wr.close();
 		
-		CE.sessionEnd();
+		int responseCode = con.getResponseCode();
+		System.out.println("\nSending 'POST' request to URL : " + url);
+		System.out.println("Post parameters : " + urlParameters);
+		System.out.println("Response Code : " + responseCode);
 		
-		long end = System.currentTimeMillis();
+		BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+		String inputLine;
 		
-		System.out.println("Total time : " + (end - start) + " ms");
+		int rowNum = 0;
 		
-
+		while ((inputLine = in.readLine()) != null) 
+		{
+			rowNum = Integer.parseInt(inputLine);
+		}
+		
+		return rowNum;
 	}
-
-
+	
 	public void sessionEnd() throws IOException
 	{
 		String url = SERVER_ADDRESS;
@@ -414,5 +413,43 @@ public class ClientEngine
 		//System.out.println(Enc.length);
 		//System.out.println(K);
 		this.Dec = EvenGoldreichLempel.decrypt(choice, Enc, K);
+	}
+	
+	
+	/*
+	 * Test main
+	 */
+	public static void main(String[] args) throws Exception 
+	{
+		long start = System.currentTimeMillis();
+		
+		int n = ClientEngine.queryRowNumber();
+		System.out.println("Total database row : " + n);
+		int choice = new Random().nextInt(200);
+		System.out.println("choice" + choice);
+		ClientEngine CE = new ClientEngine(choice);
+		BigInteger[] out = CE.sendHandShake();
+
+		CE.N = out[0];
+		CE.E = out[1];
+
+		CE.X = CE.sendOTKeys();
+
+		BigInteger[] KV =  EvenGoldreichLempel.generateQuery(CE.choice, CE.X, CE.N, CE.E);
+		CE.K = KV[0];
+		CE.V = KV[1];
+
+		CE.Enc = CE.sendOTQuery();
+
+		CE.Decrypt();
+		System.out.println(Utils.bigIntegerToString(CE.Dec));
+		
+		CE.sessionEnd();
+		
+		long end = System.currentTimeMillis();
+		
+		System.out.println("Total time : " + (end - start) + " ms");
+		
+
 	}
 }

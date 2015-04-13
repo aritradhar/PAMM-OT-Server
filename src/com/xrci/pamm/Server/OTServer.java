@@ -57,7 +57,8 @@ public class OTServer extends HttpServlet
 	//strings converted to biginteger number
 	public static BigInteger[] bigIntegerKeys;
 	public static byte[] privateKey, publicKey;
-
+	public static int rowNum;
+	
 	public static boolean loaded = false;
 
 	public OTServer() throws IOException 
@@ -75,17 +76,16 @@ public class OTServer extends HttpServlet
 
 		keyJson = sb.toString();
 		br.close();
-
+		
 		// parse json from the key file
 
 		JSONObject jObject = new JSONObject(keyJson);
 		JSONArray jArray = jObject.getJSONArray("StringDB");
-		base64Keys = new String[jArray.length()];
-		bigIntegerKeys = new BigInteger[jArray.length()];
-
 		this.n_msg = jArray.length();
-		
-		for(int i = 0; i < jArray.length(); i++)
+		base64Keys = new String[this.n_msg];
+		bigIntegerKeys = new BigInteger[this.n_msg];
+			
+		for(int i = 0; i < n_msg; i++)
 		{
 			JSONObject ob = (JSONObject) jArray.get(i);
 			//System.out.println(ob.get("imgFile").toString());
@@ -167,6 +167,14 @@ public class OTServer extends HttpServlet
 		//System.out.println("D " + D);
 		//System.out.println("E " + E);
 
+		if(flag.equalsIgnoreCase("rowNum"))
+		{
+			res.getOutputStream().write(this.n_msg);
+			res.getOutputStream().flush();
+			res.getOutputStream().close();
+			return;
+		}
+		
 		//destroy all states
 		if(flag.equalsIgnoreCase("endSession"))
 		{
