@@ -203,7 +203,7 @@ public class OTServer extends HttpServlet
 			{
 				if(UserList.getState(ip, port) > 0)
 				{
-					System.err.print("Wrong state. Client rejected " + random_token);
+					System.err.println("Wrong state. Client rejected " + random_token);
 					String response = "wrong_state";
 					res.getOutputStream().write(response.getBytes());
 					res.getOutputStream().flush();
@@ -215,7 +215,7 @@ public class OTServer extends HttpServlet
 			{
 				if(UserList.getState(random_token) >0 )
 				{
-					System.err.print("Wrong state. Client rejected " + random_token);
+					System.err.println("Wrong state. Client rejected " + random_token);
 					String response = "wrong_state";
 					res.getOutputStream().write(response.getBytes());
 					res.getOutputStream().flush();
@@ -235,7 +235,7 @@ public class OTServer extends HttpServlet
 				return;
 			}
 			else
-				System.err.print("Signature verified " + signature);
+				System.err.println("Signature verified " + signature);
 			
 			if(!ENV.USE_SESSION_TOKEN)
 			{
@@ -269,10 +269,7 @@ public class OTServer extends HttpServlet
 				{
 					e.printStackTrace();
 				}
-			}
-			
-			
-			
+			}		
 			
 			String response = N.toString().concat("\n").concat(E.toString()).concat("\n").concat(Base64.encodeBase64URLSafeString(publicKey));
 			res.getOutputStream().write(response.getBytes());
