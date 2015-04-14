@@ -25,6 +25,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.nio.ByteBuffer;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -59,9 +60,9 @@ public class ClientEngine
 	private static String USER_AGENT = "Mozilla/5.0";
 	//private static String SERVER_ADDRESS = "http://localhost:9080/AdResponse/MainServlet";
 	
-	private static String SERVER_ADDRESS = //"http://localhost:8080/PAMM_OT_Server/MainServlet";
+	private static String SERVER_ADDRESS = "http://localhost:8080/PAMM_OT_Server/MainServlet";
 			//"http://localhost:8080/pammClient/MainServlet";
-			"http://13.218.151.91:9080/PAMM_OT_Server/MainServlet";
+			//"http://13.218.151.91:9080/PAMM_OT_Server/MainServlet";
 	
 	public BigInteger N, E;
 	public BigInteger[] X;
@@ -130,17 +131,18 @@ public class ClientEngine
 		System.out.println("Post parameters : " + urlParameters);
 		System.out.println("Response Code : " + responseCode);
 		
-		BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-		String inputLine;
+		byte[] received = IOUtils.toByteArray(con.getInputStream());
+		ByteBuffer bf = ByteBuffer.wrap(received);
 		
-		int rowNum = 0;
+		/*BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+		String inputLine;
 		
 		while ((inputLine = in.readLine()) != null) 
 		{
 			rowNum = Integer.parseInt(inputLine);
-		}
+		}*/
 		
-		return rowNum;
+		return bf.getInt();
 	}
 	
 	public void sessionEnd() throws IOException

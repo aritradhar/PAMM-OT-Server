@@ -20,6 +20,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.nio.ByteBuffer;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -169,7 +170,10 @@ public class OTServer extends HttpServlet
 
 		if(flag.equalsIgnoreCase("rowNum"))
 		{
-			res.getOutputStream().write(this.n_msg);
+			System.out.println("#### " + this.n_msg);
+			ByteBuffer bf = ByteBuffer.allocate(4);
+			bf.putInt(n_msg);
+			res.getOutputStream().write(bf.array());
 			res.getOutputStream().flush();
 			res.getOutputStream().close();
 			return;
