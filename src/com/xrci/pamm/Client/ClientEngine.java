@@ -427,7 +427,7 @@ public class ClientEngine
 		
 		int n = ClientEngine.queryRowNumber();
 		System.out.println("Total database row : " + n);
-		int choice = new Random().nextInt(200);
+		int choice = new Random().nextInt(n);
 		System.out.println("choice" + choice);
 		ClientEngine CE = new ClientEngine(choice);
 		BigInteger[] out = CE.sendHandShake();
