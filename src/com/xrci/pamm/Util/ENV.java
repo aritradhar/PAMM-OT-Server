@@ -22,4 +22,6 @@ public class ENV
 	public static final int LZMA_TRAFFIC_COMPRESSION_LEVEL = 1;
 	
 	public static final boolean USE_SESSION_TOKEN = true;
+	
+	public static int counter_total_request;
 }

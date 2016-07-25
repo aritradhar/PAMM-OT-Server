@@ -60,9 +60,9 @@ public class ClientEngine
 	private static String USER_AGENT = "Mozilla/5.0";
 	//private static String SERVER_ADDRESS = "http://localhost:9080/AdResponse/MainServlet";
 	
-	private static String SERVER_ADDRESS = "http://localhost:8080/PAMM_OT_Server/MainServlet";
+	private static String SERVER_ADDRESS = //"http://localhost:8080/PAMM_OT_Server/MainServlet";
 			//"http://localhost:8080/pammClient/MainServlet";
-			//"http://13.218.151.91:9080/PAMM_OT_Server/MainServlet";
+			"http://13.218.151.91:9080/PAMM_OT_Server/MainServlet";
 	
 	public BigInteger N, E;
 	public BigInteger[] X;

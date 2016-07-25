@@ -112,6 +112,9 @@ public class OTServer extends HttpServlet
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse res) throws ServletException, IOException 
 	{
+		ENV.counter_total_request++;
+		System.out.println("Total Request : " + ENV.counter_total_request);
+		
 		res.setContentType("text/plain");
 
 		String flag = request.getParameter("flag");

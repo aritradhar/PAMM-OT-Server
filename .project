@@ -4,7 +4,6 @@
 	<comment></comment>
 	<projects>
 		<project>Crypt</project>
-		<project>Curve-25519</project>
 		<project>JSON-java</project>
 		<project>LZMA</project>
 	</projects>

@@ -30,7 +30,7 @@ public class MakeKey
 {
 	public static void main(String[] args) throws NoSuchAlgorithmException, InvalidKeySpecException, IOException 
 	{
-		BigInteger[] out = EvenGoldreichLempel.generateServerKey(512);
+		BigInteger[] out = EvenGoldreichLempel.generateServerKey(512, 512);
 		BigInteger N = out[0];
 		BigInteger D = out[1];
 		BigInteger E = out[2];
